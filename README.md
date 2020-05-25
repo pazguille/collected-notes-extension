@@ -2,7 +2,7 @@
 
 > A Chrome extension to create new notes with just one click.
 
-<img src="collected-notes.jpg" width="640" height="400">
+<img src="./assets/collected-notes.jpg" width="640" height="400">
 
 ### Installation Instructions
 
