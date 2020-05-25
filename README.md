@@ -6,7 +6,7 @@
 
 ### Installation Instructions
 
-1. Download this repo as a [ZIP file](https://github.com/GoogleChrome/web-vitals-extension/archive/master.zip).
+1. Download this repo as a [ZIP file](https://github.com/pazguille/collected-notes-extension/archive/master.zip).
 2. Unzip the file and you should have a folder named `collected-notes-extension-master`.
 3. In Chrome go to [the extensions page](chrome://extensions) (`chrome://extensions`).
 4. Enable `Developer Mode` checkbox.
