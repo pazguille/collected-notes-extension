@@ -4,9 +4,9 @@ const loginUrl = 'https://collectednotes.com/users/sign_in';
 // Make logs easier to use
 const log = chrome.extension.getBackgroundPage().console.log;
 
-async function createNewNote() {
+async function createNewNote(selectedText) {
   const url = await getSiteUrl();
-  createTab(url);
+  createTab(url, selectedText);
 }
 
 function getSiteUrl() {
@@ -18,12 +18,12 @@ function getSiteUrl() {
   });
 }
 
-function createTab(url) {
+function createTab(url, selectedText) {
   chrome.tabs.create({ url, active: true }, async (tab) => {
     const siteUrl = await executeScript(tab.id);
     if (siteUrl) {
       saveUrl(siteUrl);
-      updateTab(tab.id, siteUrl, loadTemplate);
+      updateTab(tab.id, siteUrl, selectedText, loadTemplate);
     } else {
       updateTab(tab.id, loginUrl);
     }
@@ -43,29 +43,55 @@ function saveUrl(url) {
   chrome.storage.sync.set({ [keyStorage]: url });
 }
 
-function updateTab(tabId, url, fn) {
+function updateTab(tabId, url, selectedText, fn) {
   chrome.tabs.onUpdated.addListener((tabId , info) => {
     if (info.status === 'complete') {
-      fn && fn(tabId);
+      fn && fn(tabId, selectedText);
     }
   });
   chrome.tabs.update(tabId, { url });
 }
 
 
-function loadTemplate(tabId) {
-  chrome.storage.sync.get('template', ({ template }) => {
-    if (template) {
-      template = '`'+template+'`';
-      chrome.tabs.executeScript(tabId, { code: `
+function loadTemplate(tabId, selectedText) {
+    chrome.storage.sync.get('template', ({ template }) => {
+      if (selectedText) {
+        fillNote(tabId, selectedText);
+      } else {
+        if (template) {
+          fillNote(tabId, template);
+        }
+      }
+    });
+}
+
+
+function fillNote(tabId, body){
+  let scapedBody = '`'+body+'`';
+  chrome.tabs.executeScript(tabId, { code: `
         setTimeout(() => {
-          document.querySelector('textarea').value = ${template};
+          document.querySelector('textarea').value = ${scapedBody};
           const eve = new Event('change', { bubbles:true })
           document.querySelector('textarea').dispatchEvent(eve);
         }, 500);
       `});
-    }
-  });
 }
 
-chrome.browserAction.onClicked.addListener(createNewNote);
+
+chrome.contextMenus.create({
+  id: "collected-notes-cm",
+  title: "Collect note",
+  contexts: ["selection"]
+}, chrome.contextMenus.onClicked.addListener(function(info, tab) {
+    createNewNote(info.selectionText);
+  })
+);
+
+
+chrome.browserAction.onClicked.addListener(function(e){
+  chrome.tabs.executeScript( {
+    code: "window.getSelection().toString();"
+  }, function(selected) {
+    return createNewNote(selected[0]);
+  });
+});

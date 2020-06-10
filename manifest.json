@@ -6,7 +6,7 @@
   "icons": {
     "16": "assets/icon.png"
   },
-  "permissions": ["storage", "tabs", "https://collectednotes.com/*"],
+  "permissions": ["storage", "tabs", "https://collectednotes.com/*", "activeTab", "contextMenus"],
   "background": {
     "persistent": false,
     "scripts": ["src/background.js"]
