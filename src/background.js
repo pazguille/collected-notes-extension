@@ -56,10 +56,10 @@ function updateTab(tabId, url, selectedText, fn) {
 function loadTemplate(tabId, selectedText) {
     chrome.storage.sync.get('template', ({ template }) => {
       if (selectedText) {
-        fillNote(tabId, selectedText);
+        let noteBody = '# This is your title\\n\\n>'+ selectedText;
+        fillNote(tabId, noteBody);
       } else {
         if (template) {
-          template = '`'+template+'`';
           fillNote(tabId, template);
         }
       }
@@ -68,9 +68,10 @@ function loadTemplate(tabId, selectedText) {
 
 
 function fillNote(tabId, body){
+  body = '`'+body+'`';
   chrome.tabs.executeScript(tabId, { code: `
         setTimeout(() => {
-          document.querySelector('textarea').value = '# This is your title\\n\\n>${body}';
+          document.querySelector('textarea').value = ${body};
           const eve = new Event('change', { bubbles:true })
           document.querySelector('textarea').dispatchEvent(eve);
         }, 500);
@@ -80,9 +81,12 @@ function fillNote(tabId, body){
 
 chrome.contextMenus.create({
   id: "collected-notes-cm",
-  title: "Collect note",
+  title: "Add Note",
   contexts: ["selection"]
 }, chrome.contextMenus.onClicked.addListener(function(info, tab) {
     createNewNote(info.selectionText);
   })
 );
+
+
+chrome.browserAction.onClicked.addListener(function (e) { createNewNote("");});
