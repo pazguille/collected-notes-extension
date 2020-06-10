@@ -2,9 +2,65 @@
 <html>
   <head>
     <title>Collected Notes Extension Options</title>
+    <style>
+      body {
+        width: 50%;
+        margin: 0 auto;
+        background-color: #1a1a1a;
+        color: #ffffff;
+        font-size: 16px;
+      }
+      fieldset {
+        margin-bottom: 20px;
+        border: 1px solid #444444;
+        border-radius: 4px;
+        padding: 15px;
+        width: 100%;
+      }
+      legend {
+        font-size: 1.2em;
+        padding: 0 10px;
+      }
+      button {
+        border: none;
+        padding: 10px 15px;
+        font-size: 1em;
+        margin: 5px 0;
+        color: #ffffff;
+        background-color: #444;
+        border-radius: 4px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      textarea {
+        border: none;
+        background-color: #444444;
+        resize: vertical;
+        color: #ffffff;
+        font-size: 1em;
+        padding: 10px;
+        border-radius: 4px;
+      }
+      button:focus,
+      textarea:focus {
+        outline: 1px solid;
+      }
+    </style>
   </head>
   <body>
-    <button type="button" id="clear">Clear extension storage</button>
+    <h1>Collected Notes Extension Options</h1>
+    <form>
+      <fieldset>
+        <legend>Notes template</legend>
+        <textarea id="template" rows="25" cols="70"></textarea>
+        <button type="button" id="saveTemplate">Save</button>
+        <button type="button" id="removeTemplate">Remove</button>
+      </fieldset>
+      <fieldset>
+        <legend>Clear extension storage</legend>
+        <button type="button" id="clear">Clear</button>
+      </fieldset>
+    </form>
     <script src="./options.js"></script>
   </body>
 </html>

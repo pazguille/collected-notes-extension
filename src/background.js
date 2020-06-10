@@ -23,7 +23,7 @@ function createTab(url) {
     const siteUrl = await executeScript(tab.id);
     if (siteUrl) {
       saveUrl(siteUrl);
-      updateTab(tab.id, siteUrl);
+      updateTab(tab.id, siteUrl, loadTemplate);
     } else {
       updateTab(tab.id, loginUrl);
     }
@@ -43,8 +43,29 @@ function saveUrl(url) {
   chrome.storage.sync.set({ [keyStorage]: url });
 }
 
-function updateTab(tabId, url) {
+function updateTab(tabId, url, fn) {
+  chrome.tabs.onUpdated.addListener((tabId , info) => {
+    if (info.status === 'complete') {
+      fn && fn(tabId);
+    }
+  });
   chrome.tabs.update(tabId, { url });
+}
+
+
+function loadTemplate(tabId) {
+  chrome.storage.sync.get('template', ({ template }) => {
+    if (template) {
+      template = '`'+template+'`';
+      chrome.tabs.executeScript(tabId, { code: `
+        setTimeout(() => {
+          document.querySelector('textarea').value = ${template};
+          const eve = new Event('change', { bubbles:true })
+          document.querySelector('textarea').dispatchEvent(eve);
+        }, 500);
+      `});
+    }
+  });
 }
 
 chrome.browserAction.onClicked.addListener(createNewNote);
