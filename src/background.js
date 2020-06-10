@@ -59,6 +59,7 @@ function loadTemplate(tabId, selectedText) {
         fillNote(tabId, selectedText);
       } else {
         if (template) {
+          template = '`'+template+'`';
           fillNote(tabId, template);
         }
       }
@@ -67,10 +68,9 @@ function loadTemplate(tabId, selectedText) {
 
 
 function fillNote(tabId, body){
-  let scapedBody = '`'+body+'`';
   chrome.tabs.executeScript(tabId, { code: `
         setTimeout(() => {
-          document.querySelector('textarea').value = ${scapedBody};
+          document.querySelector('textarea').value = '# This is your title\\n\\n>${body}';
           const eve = new Event('change', { bubbles:true })
           document.querySelector('textarea').dispatchEvent(eve);
         }, 500);
@@ -86,12 +86,3 @@ chrome.contextMenus.create({
     createNewNote(info.selectionText);
   })
 );
-
-
-chrome.browserAction.onClicked.addListener(function(e){
-  chrome.tabs.executeScript( {
-    code: "window.getSelection().toString();"
-  }, function(selected) {
-    return createNewNote(selected[0]);
-  });
-});
