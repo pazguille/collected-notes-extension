@@ -1,5 +1,6 @@
 const keyStorage = 'collectednotes_create_url';
 const loginUrl = 'https://collectednotes.com/users/sign_in';
+const selectionEventId = 'create-note-from-selection';
 
 // Make logs easier to use
 const log = chrome.extension.getBackgroundPage().console.log;
@@ -68,4 +69,35 @@ function loadTemplate(tabId) {
   });
 }
 
+function registerContextMenu () {
+  chrome.contextMenus.create({
+    id: selectionEventId,
+    title: 'Create note from selection', 
+    contexts: ['selection']
+  });  
+}
+
+async function createNoteFromSelection (info) {
+  if (info.menuItemId == selectionEventId) {
+    const url = await getSiteUrl();
+    chrome.tabs.create({ url, active: true }, async (tab) => {
+      const newNoteUrl = await executeScript(tab.id);
+      updateTab(tab.id, newNoteUrl, tabId => {
+        chrome.tabs.executeScript(tabId, { code: `
+          setTimeout(() => {
+            document.querySelector('textarea').value = '# This is your title\\n\\n>${info.selectionText}';
+            const eve = new Event('change', { bubbles:true });
+            setTimeout(() => document.querySelector('textarea').dispatchEvent(eve), 50);
+          }, 500);
+        `});
+      });
+    });
+  }
+}
+
 chrome.browserAction.onClicked.addListener(createNewNote);
+
+chrome.runtime.onInstalled.addListener(registerContextMenu);
+
+chrome.contextMenus.onClicked.addListener(createNoteFromSelection);
+
