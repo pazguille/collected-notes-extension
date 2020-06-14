@@ -1,12 +1,17 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "name": "Collected Notes",
   "description": "Create new notes on Collected Notes",
   "manifest_version": 2,
   "icons": {
     "16": "assets/icon.png"
   },
-  "permissions": ["storage", "tabs", "https://collectednotes.com/*", "contextMenus"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "https://collectednotes.com/*",
+    "contextMenus"
+  ],
   "background": {
     "persistent": false,
     "page": "src/background.html"
