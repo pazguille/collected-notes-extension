@@ -1,3 +1,5 @@
+import logger from './logger.js';
+
 // Load template
 chrome.storage.sync.get('template', ({ template }) => {
   if (template) {
