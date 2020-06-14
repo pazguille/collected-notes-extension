@@ -43,10 +43,12 @@ export default class Note {
    * Create a new tab to login page to get the user notes url.
    */
   goToLogin() {
-    chrome.tabs.create({ url: this.loginUrl, active: true }, async () => {
-      const url = await this.getUrlFromDOM();
+    chrome.tabs.create({ url: this.loginUrl, active: true }, async (tab) => {
+      const url = await this.getUrlFromDOM(tab);
       if (url) {
-        this.saveUrl();
+        chrome.tabs.remove(tab.id);
+        this.saveUrl(url);
+        this.url = url;
         this.createTab();
       }
     });
@@ -55,9 +57,9 @@ export default class Note {
   /**
    * Get the user notes url from the login page DOM.
    */
-  async getUrlFromDOM() {
+  async getUrlFromDOM(tab) {
     return new Promise((resolve, reject) => {
-      chrome.tabs.executeScript(this.tab.id, {
+      chrome.tabs.executeScript(tab.id, {
         code: 'document.querySelector(".floating").href'
       }, result => resolve(result[0]));
     });
@@ -88,8 +90,8 @@ export default class Note {
   /**
    * Save the user notes url into the storage
    */
-  saveUrl() {
-    chrome.storage.sync.set({ [this.keyStorage]: this.url });
+  saveUrl(url) {
+    chrome.storage.sync.set({ [this.keyStorage]: url });
   };
 
   /**
